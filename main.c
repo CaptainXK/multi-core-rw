@@ -134,5 +134,7 @@ int main(int argc, char** argv)
         printf("\n");
     }
 
+    env_uinit();
+
     return 0;
 }
