@@ -1,13 +1,16 @@
 .PHONY:clean check_obj_dir
 
+CC := g++
 OBJ_DIR := obj
-SRCS := $(wildcard *.c)
-OBJS := $(patsubst %.c, $(OBJ_DIR)/%.o, $(SRCS) )
+SRCS := $(wildcard *.cpp)
+OBJS := $(patsubst %.cpp, $(OBJ_DIR)/%.o, $(SRCS) )
 LIBS := -lpthread
+#DEBUG := -D DEBUG
+CFLAGS := -I.
 
 
 test.app:check_obj_dir $(OBJS)
-	gcc $(OBJS) -o $@ -g $(LIBS)
+	$(CC) $(OBJS) -o $@ -g $(LIBS)
 
 
 check_obj_dir:
@@ -18,8 +21,8 @@ check_obj_dir:
 	fi
 
 
-$(OBJ_DIR)/%.o:%.c
-	gcc -c $< -o $@ -g
+$(OBJ_DIR)/%.o:%.cpp
+	$(CC) -c  $(CFLAGS) $< -o $@ -g $(DEBUG) 
 
 
 test:test.app
