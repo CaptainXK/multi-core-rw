@@ -8,6 +8,7 @@
 #include <sched.h>
 #include <iostream>
 #include <thread>
+#include <functional>
 
 #include <CAS_FUNC.hpp>
 #include <numa-arch-helper.hpp>
@@ -68,20 +69,6 @@ void thd_func(int id)
 {
     int tar_cpu = id;
 
-/*
-    cpu_set_t cpu_set;
-    CPU_ZERO(&cpu_set);
-    CPU_SET(tar_cpu, &cpu_set);
-
-    if(pthread_setaffinity_np(pthread_self(), sizeof(cpu_set), &cpu_set) != 0){
-        fprintf(stderr, "cpu migrate error");
-        exit(1);
-    }
-    else{
-        printf("[CPU#%d working thread is lunched done]\n", sched_getcpu());
-    }
-*/
-
     while(test_data.start_work == 0);        
 
     //start to work
@@ -104,6 +91,11 @@ void thd_func(int id)
     }while(!DO_CAS(&test_data.thd_count, old_thd_count, old_thd_count + 1));
 }
 
+void assign_thread(std::thread ** thd, std::function<void(int)> func, int id)
+{
+    *thd = new std::thread(func, id);
+}
+
 int main(int argc, char** argv)
 {
     env_init();
@@ -114,8 +106,7 @@ int main(int argc, char** argv)
     int i = 0;
 
     for(i = 0; i < MAX_THD_NB; ++i){
-    //    pthread_create(&thds[i], NULL, thd_func, &i);
-        thds[i] = new std::thread(thd_func, i);
+        assign_thread(&(thds[i]), thd_func, i);
         thread_migrate(*(thds[i]));
     }
 
