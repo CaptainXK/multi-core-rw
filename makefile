@@ -6,7 +6,7 @@ SRCS := $(wildcard *.cpp)
 OBJS := $(patsubst %.cpp, $(OBJ_DIR)/%.o, $(SRCS) )
 LIBS := -lpthread
 #DEBUG := -D DEBUG
-CFLAGS := -I.
+CFLAGS := -I. -std=c++11
 
 
 test.app:check_obj_dir $(OBJS)
