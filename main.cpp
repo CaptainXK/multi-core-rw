@@ -103,8 +103,6 @@ void thd_func(int id)
         }
 
         //CAS op to modify shared count var
-
-        //encounter
         do{
             old_thd_count = test_data.thd_count;
         }while(!DO_CAS(&test_data.thd_count, old_thd_count, old_thd_count + 1));
@@ -173,7 +171,9 @@ int main(int argc, char** argv)
 
         test_data.thd_count = 0;
 
+        //this line can obtain more better stability, but i have not found the reason yet
         __sync_synchronize();
+
         do{
             old_lock = self_lock;
         }while(!DO_CAS(&self_lock, old_lock, (uint8_t)(old_lock | (uint8_t)0xFF)) );
