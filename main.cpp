@@ -79,6 +79,10 @@ void thd_func(int id)
 
     printf("Target CPU id=%d, self lock mask = %.2hhx, inverse mask = %.2hhx\n", id, lock_mask, ~lock_mask);
 
+    int old_head;
+    int old_thd_count;
+    uint8_t old_lock;
+   
     while(!force_quit){
         //test self lock
         while( (self_lock & lock_mask ) == 0 );
@@ -87,7 +91,6 @@ void thd_func(int id)
         while(test_data.start_work == 0);
 
         //start to work
-        int old_head;
 
         //CAS op to find work area 
         do{
@@ -100,7 +103,6 @@ void thd_func(int id)
         }
 
         //CAS op to modify shared count var
-        int old_thd_count;
 
         //encounter
         do{
@@ -108,8 +110,6 @@ void thd_func(int id)
         }while(!DO_CAS(&test_data.thd_count, old_thd_count, old_thd_count + 1));
 
         //lock self lock
-        uint8_t old_lock;
-    //    self_lock &= ~lock_mask;
         do{
             old_lock = self_lock; 
         }while(!DO_CAS(&self_lock, old_lock, (uint8_t)(old_lock & ~lock_mask) ) );        
