@@ -143,6 +143,7 @@ int main(int argc, char** argv)
 
     int i = 0;
     int test_count = 0;
+    uint8_t old_lock;
 
     for(i = 0; i < MAX_THD_NB; ++i){
         assign_thread(&(thds[i]), thd_func, i);
@@ -173,8 +174,10 @@ int main(int argc, char** argv)
         test_data.thd_count = 0;
 
         __sync_synchronize();
-
-        self_lock |= 0xFF;
+        do{
+            old_lock = self_lock;
+        }while(!DO_CAS(&self_lock, old_lock, (uint8_t)(old_lock | (uint8_t)0xFF)) );
+        //self_lock |= 0xFF;
     }
 
 #ifdef DEBUG
