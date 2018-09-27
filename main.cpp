@@ -16,7 +16,7 @@
 #include <numa-arch-helper.hpp>
 
 #define DATA_NB 1024
-#define MAX_THD_NB 8
+#define MAX_THD_NB 2
 
 //functions
 void test_data_init();
@@ -77,7 +77,7 @@ void thd_func(int id)
 
     uint8_t lock_mask = (uint8_t)1 << id; 
 
-    printf("Target CPU id=%d, self lock mask = %.2hhx, inverse mask = %.2hhx\n", id, lock_mask, ~lock_mask);
+//    printf("Target CPU id=%d, self lock mask = %.2hhx, inverse mask = %.2hhx\n", id, lock_mask, (uint8_t)~lock_mask);
 
     int old_head;
     int old_thd_count;
@@ -155,9 +155,6 @@ int main(int argc, char** argv)
 
         //wait work over
         while(test_data.thd_count != MAX_THD_NB);
-      //  {
-      //      printf("Wait threads over in current round, self lock = %.u\n", self_lock);
-      //  }
 
         int error_count = 0;
 
