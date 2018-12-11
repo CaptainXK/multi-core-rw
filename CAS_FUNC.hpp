@@ -7,7 +7,7 @@ extern "C"{
 
 #include <stdbool.h>
 
-    bool DO_CAS(int * ptr, int oldval, int newval);
+    bool DO_CAS(volatile int * ptr, int oldval, int newval);
 
 #ifdef __cplusplus
 }
