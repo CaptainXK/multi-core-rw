@@ -11,9 +11,10 @@
 
 #include <CAS_FUNC.hpp>
 #include <numa-arch-helper.hpp>
+#include <time_measurer.hpp>
 
-#define DATA_NB 1024
-#define MAX_THD_NB 2
+#define DATA_NB 40960
+#define MAX_THD_NB 4
 
 //functions
 void test_data_init();
@@ -34,7 +35,7 @@ struct shared_data{
     int data[DATA_NB];
 };
 typedef struct shared_data shared_data;
-shared_data test_data;
+volatile shared_data test_data;
 
 void env_init()
 {
@@ -96,12 +97,14 @@ void thd_func(int id)
         test_data.data[i] = tar_cpu + 1;
     }
 
+    
     //CAS op to modify shared count var
     int old_thd_count;
 
     do{
         old_thd_count = test_data.thd_count;
     }while(!DO_CAS(&test_data.thd_count, old_thd_count, old_thd_count + 1));
+
 }
 
 int main(int argc, char** argv)
@@ -119,10 +122,16 @@ int main(int argc, char** argv)
         thread_migrate(*(thds[i]));
     }
 
-//    std::cout<<"work go"<<std::endl;
     test_data.start_work = 1;    
 
+    time_start();
+
+    //poll working status
     while(test_data.thd_count != MAX_THD_NB);
+
+    time_stop();
+
+    time_report();
 
     int error_count = 0;
 
